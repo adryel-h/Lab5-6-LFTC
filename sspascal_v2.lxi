@@ -1,0 +1,81 @@
+%{
+#include "sspascal.tab.h"
+%}
+
+%option noyywrap
+%option caseless
+
+LITERA		[A-Za-z_]
+CIFRA		[0-9A-Fa-f]
+CIFRA_ZEC	[0-9]
+IDENTIFICATOR	{LITERA}({LITERA}|{CIFRA_ZEC})*
+NR_BAZA10	{CIFRA_ZEC}+
+EXPON		(E|e)("+"?|"-"){CIFRA_ZEC}{1,2}
+NR_REAL		{NR_BAZA10}"."{NR_BAZA10}{EXPON}?
+DELIMIT_1	[;.,]
+OPERATOR_1	[+*()]|"-"|"["|"]"
+SIR_CAR		["][^\n"]*["]
+CARACTER	"'"[^\n]"'"
+
+%%
+
+[ \t\n]
+
+else		{printf("ELSE");return ELSE;}
+if		{printf("IF");return IF;}
+while		{printf("WHILE");return WHILE;}
+for             {printf("FOR");return FOR;}
+int             {printf("INT");return INT;}
+main            {printf("MAIN");return MAIN;}
+cin             {printf("CIN");return CIN;}
+cout            {printf("COUT");return COUT;}
+
+char		{printf("CHAR");return CHAR;}
+real		{printf("REAL");return REAL;}
+
+"("             {printf("PR_O"); return PR_O;}
+")"             {printf("PR_C"); return PR_C;}
+"{"             {printf("BR_O"); return BR_O;}
+"}"             {printf("BR_C"); return BR_C;}
+">>"            {printf("OPCIN"); return OPCIN;}
+"<<"            {printf("OPCOUT"); return OPCOUT;}
+"<"		{printf("STRICT_LESS"); return STRICT_LESS;}
+">"		{printf("STRICT_GREAT"); return STRICT_GREAT;}
+"=="            {printf("E");return E;}
+"="		{printf("ATRIB");return ATRIB;}
+"!="		{printf("NE");return NE;}
+"<="		{printf("LE");return LE;}
+">="		{printf("GE");return GE;}
+"&&"            {printf("AND"); return AND;}
+"||"            {printf("OR"); return OR;}
+"!"             {printf("NOT"); return NOT;}
+"%"             {printf("MOD"); return MOD;}
+"/"             {printf("DIV"); return DIV;} 
+
+
+{IDENTIFICATOR}	{printf("ID");return ID;}
+{NR_BAZA10}	{
+	yylval.p_val = yytext;
+	printf("CONST_INT");
+	return CONST_INT;
+		}
+{NR_REAL}	{
+	yylval.p_val = yytext;
+	printf("CONST_REAL");
+	return CONST_REAL;
+		}
+{CARACTER}	{
+	yylval.p_val = yytext;
+	printf("CONST_CHAR");
+	return CONST_CAR;
+		}
+{SIR_CAR}	{
+printf("CONST_SIR");
+return CONST_SIR;}
+
+{DELIMIT_1}	{printf("%s", yytext); return yytext[0];}
+{OPERATOR_1}	{printf("%s", yytext); return yytext[0];}
+
+.		{printf("Eroare lexicala");}
+
+%%
